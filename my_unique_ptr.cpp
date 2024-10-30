@@ -19,16 +19,14 @@ public:
     // Constructor
     explicit my_unique(T *ptr = nullptr) : ptr_(ptr)
     {
-        std::cout << "Constructor" << std::endl;
+        std::cout << "Unique Ptr Ctor" << std::endl;
     }
 
     // Destructor
     ~my_unique()
     {
-        if (ptr_)
-        {
-            delete ptr_;
-        }
+        std::cout << "~Unique Ptr Dtor" << std::endl;
+        delete ptr_;
     }
 
     // Copy constructor and assignment operator deleted
@@ -38,19 +36,19 @@ public:
     // Move constructor
     my_unique(my_unique &&other) noexcept : ptr_(other.ptr_)
     {
-        std::cout << "Move constructor" << std::endl;
-        other.ptr_ = nullptr;
+        std::cout << "Move Ctor" << std::endl;
+        other.release();
     }
 
     // Move assignment operator
     my_unique &operator=(my_unique &&other) noexcept
     {
-        std::cout << "assignment operator" << std::endl;
+        std::cout << "Move Assignment" << std::endl;
         if (this != &other)
         {
             delete ptr_;
-            ptr_ = other.ptr_;
-            other.ptr_ = nullptr;
+            ptr_ = other.get();
+            other.release();
         }
         return *this;
     }
@@ -59,11 +57,11 @@ public:
     template <typename U>
     my_unique(my_unique<U> &&other)
     {
-        std::cout << "U Move constructor" << std::endl;
+        std::cout << "U Move Ctor" << std::endl;
         if ((void *)this != (void *)&other)
         {
-            ptr_ = other.ptr_;
-            other.ptr_ = nullptr;
+            ptr_ = other.get();
+            other.release();
         }
     }
 
@@ -71,12 +69,12 @@ public:
     template <typename U>
     my_unique &operator=(my_unique<U> &&other)
     {
-        std::cout << "U assignment operator" << std::endl;
+        std::cout << "U Move Assignment" << std::endl;
         if ((void *)this != (void *)&other)
         {
             delete ptr_;
-            this->ptr_ = other.ptr_;
-            other.ptr_ = nullptr;
+            this->ptr_ = other.get();
+            other.release();
         }
         return *this;
     }
@@ -115,6 +113,7 @@ public:
         return ptr_ != nullptr;
     }
 
+private:
     T *ptr_;
 };
 
@@ -129,28 +128,29 @@ class Shape
 public:
     Shape()
     {
-        cout << "Shape" << endl;
+        cout << "Shape Ctor" << endl;
     }
     virtual void draw() = 0;
     virtual ~Shape()
     {
-        cout << "~Shape" << endl;
+        cout << "~Shape Dtor" << endl;
     };
 };
 class Circle : public Shape
 {
 public:
-    Circle(int r) : rad(r) {
-
-                    };
+    Circle(int r) : rad(r)
+    {
+        cout << "Circle Ctor" << endl;
+    };
     void draw()
     {
-        cout << "Circle rad:=" << rad << endl;
+        cout << "Circle Draw Rad:=" << rad << endl;
     };
     int rad;
     virtual ~Circle()
     {
-        cout << "~Circle rad:=" << rad << endl;
+        cout << "~Circle Dtor" << rad << endl;
     };
 };
 
